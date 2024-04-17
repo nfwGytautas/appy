@@ -1,0 +1,49 @@
+group API {
+    SubPath: "/api"
+}
+
+group Private extend API {
+    Middleware: [
+        JWT
+    ]
+};
+
+setup Private {
+    Values: {
+        ctx: context.Context,
+        scope: appy_tracker.Scope,
+        transaction: appy_tracker.Transaction,
+        tx: driver.Tx
+    },
+    Implementation: setup.Private
+};
+
+setup User {
+    Values: [
+        currentUserId: uint64,
+        currentUsername: string
+    ],
+    Implementation: setup.User
+};
+
+setup Page {
+    Values: [
+        page: utility.PagingSettings
+    ],
+    Implementation: setup.Page
+};
+
+endpoint GetUsers {
+    Group: Private,
+    Method: GET,
+    Returns: {
+        Status: http.StatusOK
+        Type: []wisl_model.Users
+    },
+    Setup: [
+        Private,
+        User,
+        Page
+    ]
+    Implementation: users_api.GetAllUsers
+};

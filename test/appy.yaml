@@ -1,0 +1,5 @@
+project: test
+language: go
+migrations: ""
+queries: ""
+api: ""
