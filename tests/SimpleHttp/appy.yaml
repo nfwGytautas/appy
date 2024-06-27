@@ -1,0 +1,12 @@
+project: SimpleHttp
+domain: test.com
+version: "0.0.0"
+storage: null
+jobs: null
+http:
+  address: "127.0.0.1:8080"
+  endpoints:
+    - name: hello
+      path: /hello
+      method: GET
+      args: null
