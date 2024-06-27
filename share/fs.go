@@ -50,3 +50,18 @@ func ClearFile(file string) error {
 
 	return nil
 }
+
+// Ensure a file exists and is empty
+func EnsureCleanFile(file string) error {
+	err := EnsureFile(file)
+	if err != nil {
+		return err
+	}
+
+	err = ClearFile(file)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

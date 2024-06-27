@@ -6,8 +6,10 @@ package main
 import (
 	"github.com/nfwGytautas/appy-go"
 	appy_http "github.com/nfwGytautas/appy-go/http"
+	appy_jobs "github.com/nfwGytautas/appy-go/jobs"
 
 	{{ .ProjectName }}_api "{{ .Domain }}/{{ .ProjectName }}/api"
+	{{ .ProjectName }}_jobs "{{ .Domain }}/{{ .ProjectName }}/jobs"
 )
 
 {{ GeneratedNotice }}
@@ -26,9 +28,17 @@ func main() {
 	}
 	{{ end }}
 
+	{{ if .Jobs }}
+	// Job Options
+	options.Jobs = &appy_jobs.JobSchedulerOptions{
+		PoolTick: 1 * time.Second,
+	}
+	{{ end }}
+
 	appy.Initialize(options)
 
 	Initialize{{ .ProjectName }}()
+	{{ if .Jobs }} {{ .ProjectName }}_jobs.Setup() {{ end }}
 	{{ .ProjectName }}_api.Setup()
 
 	appy.Takeover()

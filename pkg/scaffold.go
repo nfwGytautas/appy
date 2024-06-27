@@ -41,6 +41,11 @@ func Scaffold() error {
 		return err
 	}
 
+	err = checkJobs(config)
+	if err != nil {
+		return err
+	}
+
 	err = checkMain(config)
 	if err != nil {
 		return err
@@ -361,6 +366,81 @@ func checkHooksFile(config *appy_share.AppyConfig) error {
 	}
 
 	err = appy_share.RunGoFileTools(hooksFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Check that jobs exist
+func checkJobs(config *appy_share.AppyConfig) error {
+	fmt.Println("Checking jobs...")
+
+	const jobsFile = "jobs/appy_generated.go"
+
+	if config.Jobs == nil {
+		return nil
+	}
+
+	for _, job := range config.Jobs {
+		err := checkJob(config, job)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Jobs file
+	err := appy_share.EnsureCleanFile(jobsFile)
+	if err != nil {
+		return err
+	}
+
+	err = appy_templates.WriteTemplateToFile(jobsFile, appy_templates.JobsFileTemplate, config)
+	if err != nil {
+		return err
+	}
+
+	err = appy_share.RunGoFileTools(jobsFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func checkJob(config *appy_share.AppyConfig, job appy_share.Job) error {
+	jobFile := fmt.Sprintf("jobs/%v.go", job.Name)
+
+	// Don't do anything if it already exists
+	if appy_share.FileExists(jobFile) {
+		return nil
+	}
+
+	err := appy_share.EnsureFile(jobFile)
+	if err != nil {
+		return err
+	}
+
+	err = appy_share.ClearFile(jobFile)
+	if err != nil {
+		return err
+	}
+
+	data := struct {
+		Config *appy_share.AppyConfig
+		Job    appy_share.Job
+	}{
+		Config: config,
+		Job:    job,
+	}
+
+	err = appy_templates.WriteTemplateToFile(jobFile, appy_templates.JobImplementationTemplate, data)
+	if err != nil {
+		return err
+	}
+
+	err = appy_share.RunGoFileTools(jobFile)
 	if err != nil {
 		return err
 	}

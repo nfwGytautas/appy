@@ -21,8 +21,9 @@ type Storage struct {
 }
 
 type Job struct {
-	Name    string `yaml:"name"`
-	Handler string `yaml:"handler"`
+	Name        string `yaml:"name"`
+	Tick        uint32 `yaml:"tick"`
+	Independent bool   `yaml:"independent"`
 }
 
 type Http struct {
